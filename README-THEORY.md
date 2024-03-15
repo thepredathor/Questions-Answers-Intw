@@ -13,7 +13,7 @@
 
 ### **Thread methods**
 - `public synchronized void start()/ t.start()`: starts the thread object on which the method is called
-- `public abstract void run()/ r.run()`: starts the thread object on which the method is called
+- `public abstract void run()/ r.run()`: the work needing to be done by a thread. Does not start a separate thread if called.
 - `public static native void sleep()/ Thread.sleep()`: causes current thread to suspend its execution for the specified time as param (not exact, depends on os). Does not lose monitor or lock objects while sleeping. Called in general inside the `public abstract void run()` method to make the custom thread sleep. Throws an `InterruptedException` if thread is interrupted while sleeping.
 - `public void interrupt()/ t.interrupt()`: causes the thread object on which the method is called to be interrupted. The thread must support its own interruption by either catching an `InterruptedException` and treating the exception in the catch block(generally by returning silently), or by checking the `public static boolean interrupted()` method to verify the status of the interruption.
 - `public static boolean interrupted()/ t.interrupted()`: called in the `public abstract void run()` generally by a thread object to verify its own interruption while doing heavy processing that does not generally cause an `InterruptedException` to be thrown. Changes the `interrupted` status flag to false.
