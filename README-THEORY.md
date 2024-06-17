@@ -15,7 +15,7 @@
 - `public synchronized void start()/ t.start()`: starts the thread object on which the method is called
 - `public abstract void run()/ r.run()`: the work needing to be done by a thread. Does not start a separate thread if called.
 - `public static native void sleep()/ Thread.sleep()`: causes current thread to suspend its execution for the specified time as param (not exact, depends on os). Does not lose monitor or lock objects while sleeping. Called in general inside the `public abstract void run()` method to make the custom thread sleep. Throws an `InterruptedException` if thread is interrupted while sleeping.
-- `public void interrupt()/ t.interrupt()`: causes the thread object on which the method is called to be interrupted. The thread must support its own interruption by either catching an `InterruptedException` and treating the exception in the catch block(generally by returning silently), or by checking the `public static boolean interrupted()` method to verify the status of the interruption.
+- `public void interrupt()/ t.interrupt()`: causes the thread object on which the method is called to be flagged as interrupted. The thread must support its own interruption by either catching an `InterruptedException` and treating the exception in the catch block(generally by returning silently), or by checking the `public static boolean interrupted()` method to verify the status of the interruption.
 - `public static boolean interrupted()/ t.interrupted()`: called in the `public abstract void run()` generally by a thread object to verify its own interruption while doing heavy processing that does not generally cause an `InterruptedException` to be thrown. Changes the `interrupted` status flag to false.
 - `public boolean isInterrupted()/ t.isInterrupted()`: used to query the interrupt status of another thread by one thread. Does not change the interrupt status of the object is called on.
 - `public final void join()/ t.join()`: causes the current executing thread to wait until the `t thread (in t.join())` finishes its execution. Throws `InterruptedException` if thread is interrupted while method is executing
@@ -29,19 +29,19 @@
 > **Synchronization** solves these problems, but introduces new ones: (**Thread contention/liveness problems**)
 - **Thread contention/Liveness problems**: because of **synchronization**, shared resource access can cause threads to execute slower or suspend their execution. 
   - **Starvation**: greedy thread t1 acquires lock of resource object a for long period of time resulting in other threads not being able to access resource object a.
-  > [!IMPORTANT]
-  > **Starvation avoidance:**
-  > // TODO
+> [!IMPORTANT]
+> **Starvation avoidance:**
+> // TODO
   - **Livelock**: The same situation as in **deadlock**, but thread t1 releases lock for object a and thread t2 releases lock for object b to unblock the other thread, and start all over from step 1 in **deadlock** scenario.
-  > [!IMPORTANT]
-  > **Livelock avoidance:**
-  > 1) Different intervals for the livelocked threads to reacquire the locks. Thread t1 waits 1s and thread t2 waits 2s.
-  > 2) Use of **guarded blocks** with a notification system in order for one thread to notify the other thread when a lock is released
+> [!IMPORTANT]
+> **Livelock avoidance:**
+> 1) Different intervals for the livelocked threads to reacquire the locks. Thread t1 waits 1s and thread t2 waits 2s.
+> 2) Use of **guarded blocks** with a notification system in order for one thread to notify the other thread when a lock is released
   - **Deadlock**: 2 resource objects a, b. Thread t1 acquires lock for object a at the same time thread t2 acquires lock for object b. Thread t1 then tries to acquire lock for object b and t2 tries to acquire lock for object a. No thread releases any lock. Threads can not advance
-  > [!IMPORTANT]
-  > **Deadlock avoidance:** 
-  > 1) avoid acquiring multiple locks for a single thread.
-  > 2) if not possible, lock order should be maintained for all threads. 
+> [!IMPORTANT]
+> **Deadlock avoidance:** 
+> 1) avoid acquiring multiple locks for a single thread.
+> 2) if not possible, lock order should be maintained for all threads. 
 
 ### **Solving Thread Issues/Problems/Errors**
 - **Synchronization**: solves **thread interference** and **memory consistency errors** => can cause **liveness/thread contention** problems
@@ -87,8 +87,11 @@
   >```
   - once `joy = true`, the waiting threads are woken up by calling `notifyAll()`
   - the waiting threads now compete to acquire the lock for the object and start executing the remaining `guardedJoy()` method code
-  - `notify()` call removes threads from resource object **wait set**
+  - `notify()` call will make other threads to remove themselves from resource object **wait set**
+> [!IMPORTANT] 
+> `notify()/notifyALl()` will not release the lock of the object by being called. This will need to be taken care of by the programmer by not making any more code statements after the method is called in order for the synchronized block/method to release the lock on the resource object
 - **Atomic access/ `volatile` keyword**: solves **thread interference** at field level
   - an **atomic action** means an action that happens all at once (`a++` does not translate anymore to `read a; a = a + 1; write to a`)
-  - actions/changes on a `volatile` variable are seen by other threads only after the action has taken place
   - establishes a **happens-before** relationship with subsequent reads
+  - works on `primitives`
+  - on `objects` only the reference is made volatile, not the object's fields
