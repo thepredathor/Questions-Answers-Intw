@@ -1,10 +1,16 @@
 # **Contents**
 
 - [Threads](#threads)
+- [Executors and Executor Services](#executors)
 
 
 <a id="threads"></a>
 ## **Threads**
+  - Are units of task execution
+  - Mapped directly to os threads
+  - A JVM process can run across processors, processors with multiple threads (parallelism)
+  - A JVM process can run on a single processor, multi threaded (concurrency)
+  - A JVM process can run on a single processor, single threaded (concurrency)
 ### **Starting a thread**
 - By implementing `Runnable` in a custom class, overriding the `public abstract void run()` method and passing the runnable object to the `Thread` constructor as a parameter and then calling the `public synchronized void start()` method;
 - By extending `Thread` class, overriding the **public abstract void run()** method and then calling the `public synchronized void start()` method.
@@ -31,17 +37,25 @@
   - **Starvation**: greedy thread t1 acquires lock of resource object a for long period of time resulting in other threads not being able to access resource object a.
 > [!IMPORTANT]
 > **Starvation avoidance:**
-> // TODO
+> 1) make the greedy threads not greedy
+> 2) use locks with fairness mechanisms
   - **Livelock**: The same situation as in **deadlock**, but thread t1 releases lock for object a and thread t2 releases lock for object b to unblock the other thread, and start all over from step 1 in **deadlock** scenario.
 > [!IMPORTANT]
 > **Livelock avoidance:**
-> 1) Different intervals for the livelocked threads to reacquire the locks. Thread t1 waits 1s and thread t2 waits 2s.
-> 2) Use of **guarded blocks** with a notification system in order for one thread to notify the other thread when a lock is released
+> 1) different intervals for the livelocked threads to reacquire the locks. Thread t1 waits 1s and thread t2 waits 2s.
+> 2) use of **guarded blocks** with a notification system in order for one thread to notify the other thread when a lock is released
   - **Deadlock**: 2 resource objects a, b. Thread t1 acquires lock for object a at the same time thread t2 acquires lock for object b. Thread t1 then tries to acquire lock for object b and t2 tries to acquire lock for object a. No thread releases any lock. Threads can not advance
 > [!IMPORTANT]
 > **Deadlock avoidance:** 
 > 1) avoid acquiring multiple locks for a single thread.
 > 2) if not possible, lock order should be maintained for all threads. 
+- **Thread costs:**
+  - high cost of creation and resource allocation
+> [!IMPORTANT]
+> **Thread cost avoidance/reduction:**
+> 1) use of `thread pools`
+> 2) use of green threads (threads managed by the application layer(ex: JVM) instead of being managed by the os)
+> 3) coroutines 
 
 ### **Solving Thread Issues/Problems/Errors**
 - **Synchronization**: solves **thread interference** and **memory consistency errors** => can cause **liveness/thread contention** problems
@@ -49,18 +63,18 @@
     - acquires an object's intrinsic lock(monitor lock/monitor) or the `Class` object(for static methods or fields)
     - makes a resource accessible by one thread at a time
     - establishes a happens before relationship with every other subsequent access to that resource. The resource modification by one thread is seen by other threads accessing it afterwards
-    > [!IMPORTANT]
-    > `synchronized` can be used in methods for code blocks as well: 
-    >```java
-    >public void addName(String name) {
-    >  synchronized(this) {
-    >    lastName = name;
-    >    nameCount++;
-    >  }
-    >  nameList.add(name);
-    >}
-    >```
-    > `synchronized` code blocks **should** avoid invocations of other object's methods: `nameList.add(name)` because it may cause liveness issues
+> [!IMPORTANT]
+> `synchronized` can be used in methods for code blocks as well: 
+>```java
+>public void addName(String name) {
+>  synchronized(this) {
+>    lastName = name;
+>    nameCount++;
+>  }
+>  nameList.add(name);
+>}
+>```
+> `synchronized` code blocks **should** avoid invocations of other object's methods: `nameList.add(name)` because it may cause liveness issues
     - `synchronized` can be used to fine grain access to separate resources within a class (2 separate fields that are never used together can be synchronized separately in 2 different synchronized blocks)
     - **Reentrant synchronization**: anti **deadlock** mechanism for one thread. One thread can reacquire a lock held by itself. Can cause **livelock** if one thread reacquires the same lock for too much time.
 - **Guarded blocks**: solves **thread synchronization/coordination** issues
@@ -95,3 +109,6 @@
   - establishes a **happens-before** relationship with subsequent reads
   - works on `primitives`
   - on `objects` only the reference is made volatile, not the object's fields
+
+<a id="executors"></a>
+## **Executors and Executor Services**
