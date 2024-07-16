@@ -9,7 +9,7 @@
   - Are units of task execution
   - Mapped directly to os threads
   - A JVM process can run across processors, processors with multiple threads (parallelism)
-  - A JVM process can run on a single processor, multi threaded (concurrency)
+  - A JVM process can run on a single processor, multi threaded (concurrent parallel)
   - A JVM process can run on a single processor, single threaded (concurrency)
 ### **Starting a thread**
 - By implementing `Runnable` in a custom class, overriding the `public abstract void run()` method and passing the runnable object to the `Thread` constructor as a parameter and then calling the `public synchronized void start()` method;
